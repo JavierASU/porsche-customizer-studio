@@ -44,9 +44,9 @@ export default function Configurator3D() {
   const { lang } = useLang();
 
   const [variant, setVariant] = useState<'964' | '993'>('964');
-  const [bodyColor, setBodyColor] = useState(EXTERIOR_COLORS[0]);
-  const [wheelStyle, setWheelStyle] = useState(WHEEL_STYLES[0]);
-  const [interiorColor, setInteriorColor] = useState(INTERIOR_COLORS[0]);
+  const [bodyColor, setBodyColor] = useState<(typeof EXTERIOR_COLORS)[number]>(EXTERIOR_COLORS[0]);
+  const [wheelStyle, setWheelStyle] = useState<(typeof WHEEL_STYLES)[number]>(WHEEL_STYLES[0]);
+  const [interiorColor, setInteriorColor] = useState<(typeof INTERIOR_COLORS)[number]>(INTERIOR_COLORS[0]);
   const [activeTab, setActiveTab] = useState<Tab>('exterior');
   const [panelOpen, setPanelOpen] = useState(true);
   const [isTransitioning, setIsTransitioning] = useState(false);

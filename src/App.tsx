@@ -5,6 +5,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Configurator from "./pages/Configurator";
+import Configurator3D from "./pages/Configurator3D";
 import MyBuilds from "./pages/MyBuilds";
 import NotFound from "./pages/NotFound";
 
@@ -19,6 +20,7 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/configurator" element={<Configurator />} />
+          <Route path="/configurator-3d" element={<Configurator3D />} />
           <Route path="/my-builds" element={<MyBuilds />} />
           <Route path="*" element={<NotFound />} />
         </Routes>

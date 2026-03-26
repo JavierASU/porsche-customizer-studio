@@ -15,7 +15,7 @@ import {
   Palette, CircleDot, Armchair, Sun,
   RotateCw, Camera, Eye,
 } from 'lucide-react';
-import RealisticCar from '@/components/3d/RealisticCar';
+import PorscheCar from '@/components/3d/PorscheCar';
 import { useLang } from '@/lib/i18n';
 
 /* ─── colour / environment palettes ─── */
@@ -261,7 +261,7 @@ export default function Configurator3D() {
           <pointLight position={[8, 3, 6]} intensity={0.2} color="#87ceeb" />
 
           {/* Car model */}
-          <RealisticCar
+          <PorscheCar
             bodyColor={bodyColor}
             wheelColor={wheelColor}
             interiorColor={interiorColor}

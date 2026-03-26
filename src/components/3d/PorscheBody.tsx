@@ -69,11 +69,11 @@ export default function PorscheBody({ variant, bodyColor }: PorscheBodyProps) {
       <mesh geometry={bodyGeo} castShadow receiveShadow>
         <meshPhysicalMaterial
           color={bodyColor}
-          metalness={0.88}
-          roughness={0.08}
+          metalness={0.92}
+          roughness={0.28}
           clearcoat={1}
-          clearcoatRoughness={0.02}
-          envMapIntensity={2.8}
+          clearcoatRoughness={0.03}
+          envMapIntensity={3.5}
           reflectivity={1}
         />
       </mesh>
@@ -117,8 +117,8 @@ export default function PorscheBody({ variant, bodyColor }: PorscheBodyProps) {
       <mesh position={[-2.2, 0.28, 0]} castShadow>
         <boxGeometry args={[0.15, 0.12, is993 ? 1.5 : 1.35]} />
         <meshPhysicalMaterial
-          color={bodyColor} metalness={0.88} roughness={0.08}
-          clearcoat={1} clearcoatRoughness={0.02} envMapIntensity={2.8}
+          color={bodyColor} metalness={0.92} roughness={0.28}
+          clearcoat={1} clearcoatRoughness={0.03} envMapIntensity={3.5}
         />
       </mesh>
 
@@ -126,8 +126,8 @@ export default function PorscheBody({ variant, bodyColor }: PorscheBodyProps) {
       <mesh position={[2.25, 0.28, 0]} castShadow>
         <boxGeometry args={[0.15, 0.12, is993 ? 1.5 : 1.35]} />
         <meshPhysicalMaterial
-          color={bodyColor} metalness={0.88} roughness={0.08}
-          clearcoat={1} clearcoatRoughness={0.02} envMapIntensity={2.8}
+          color={bodyColor} metalness={0.92} roughness={0.28}
+          clearcoat={1} clearcoatRoughness={0.03} envMapIntensity={3.5}
         />
       </mesh>
 
@@ -136,8 +136,8 @@ export default function PorscheBody({ variant, bodyColor }: PorscheBodyProps) {
         <mesh key={side} position={[-0.1, 0.48, side * (is993 ? 0.79 : 0.72)]}>
           <boxGeometry args={[1.2, 0.3, 0.005]} />
           <meshPhysicalMaterial
-            color={bodyColor} metalness={0.88} roughness={0.1}
-            clearcoat={1} envMapIntensity={2}
+            color={bodyColor} metalness={0.92} roughness={0.28}
+            clearcoat={1} envMapIntensity={3.5}
           />
         </mesh>
       ))}
@@ -147,7 +147,7 @@ export default function PorscheBody({ variant, bodyColor }: PorscheBodyProps) {
         <group key={`mirror-${side}`} position={[-0.4, 0.65, side * (is993 ? 0.82 : 0.75)]}>
           <mesh>
             <boxGeometry args={[0.08, 0.05, 0.06]} />
-            <meshPhysicalMaterial color={bodyColor} metalness={0.88} roughness={0.08} clearcoat={1} />
+            <meshPhysicalMaterial color={bodyColor} metalness={0.92} roughness={0.28} clearcoat={1} envMapIntensity={3.5} />
           </mesh>
           <mesh position={[-0.045, 0, 0]}>
             <boxGeometry args={[0.005, 0.04, 0.05]} />
@@ -167,7 +167,7 @@ export default function PorscheBody({ variant, bodyColor }: PorscheBodyProps) {
         <group position={[1.9, 0.72, 0]}>
           <mesh castShadow>
             <boxGeometry args={[0.22, 0.018, 1.2]} />
-            <meshPhysicalMaterial color={bodyColor} metalness={0.88} roughness={0.08} clearcoat={1} envMapIntensity={2.8} />
+            <meshPhysicalMaterial color={bodyColor} metalness={0.92} roughness={0.28} clearcoat={1} envMapIntensity={3.5} />
           </mesh>
           {/* Spoiler supports */}
           {[0.35, -0.35].map((pz, i) => (
@@ -183,7 +183,7 @@ export default function PorscheBody({ variant, bodyColor }: PorscheBodyProps) {
       {!is993 && (
         <mesh position={[1.85, 0.68, 0]} castShadow>
           <boxGeometry args={[0.15, 0.012, 1.0]} />
-          <meshPhysicalMaterial color={bodyColor} metalness={0.88} roughness={0.08} clearcoat={1} envMapIntensity={2.8} />
+          <meshPhysicalMaterial color={bodyColor} metalness={0.92} roughness={0.28} clearcoat={1} envMapIntensity={3.5} />
         </mesh>
       )}
 

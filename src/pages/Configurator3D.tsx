@@ -13,12 +13,13 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   ArrowLeft, RotateCcw, ChevronDown,
   Palette, CircleDot, Armchair, Sun,
-  RotateCw, Camera, Eye,
+  RotateCw, Camera, Eye, Disc,
 } from 'lucide-react';
 import PorscheCar from '@/components/3d/PorscheCar';
+import type { WheelDesign } from '@/components/3d/PorscheWheels';
 import { useLang } from '@/lib/i18n';
 
-/* ─── colour / environment palettes ─── */
+/* ─── palettes ─── */
 
 const EXTERIOR_COLORS = [
   { id: 'guards-red',    hex: '#b5121b', name: { en: 'Guards Red',       es: 'Rojo Guardia' } },
@@ -39,6 +40,12 @@ const WHEEL_COLORS = [
   { id: 'gold',      hex: '#c8a84e', name: { en: 'Classic Gold',   es: 'Dorado Clásico' } },
   { id: 'gunmetal',  hex: '#3a3a3a', name: { en: 'Gunmetal',       es: 'Gris Grafito' } },
   { id: 'bronze',    hex: '#8B6914', name: { en: 'Satin Bronze',   es: 'Bronce Satinado' } },
+];
+
+const WHEEL_DESIGNS: { id: WheelDesign; name: { en: string; es: string } }[] = [
+  { id: 'fuchs',        name: { en: 'Fuchs Classic',   es: 'Fuchs Clásico' } },
+  { id: 'cup',          name: { en: 'Cup Design',      es: 'Diseño Cup' } },
+  { id: 'turbo-twist',  name: { en: 'Turbo Twist',     es: 'Turbo Twist' } },
 ];
 
 const INTERIOR_COLORS = [
@@ -68,10 +75,10 @@ function Loader() {
     <Html center>
       <div className="flex flex-col items-center gap-4">
         <div className="relative w-16 h-16">
-          <div className="absolute inset-0 border-2 border-[#c8a84e]/30 rounded-full" />
-          <div className="absolute inset-0 border-2 border-t-[#c8a84e] rounded-full animate-spin" />
+          <div className="absolute inset-0 border-2 border-primary/30 rounded-full" />
+          <div className="absolute inset-0 border-2 border-t-primary rounded-full animate-spin" />
         </div>
-        <span className="text-xs text-[#c8a84e] tracking-[0.25em] uppercase font-light animate-pulse">
+        <span className="text-xs text-primary tracking-[0.25em] uppercase font-light animate-pulse">
           Loading Porsche…
         </span>
       </div>
@@ -102,7 +109,7 @@ function ReflectiveFloor() {
   );
 }
 
-/* ─── main component ─── */
+/* ─── main ─── */
 
 export default function Configurator3D() {
   const { lang } = useLang();
@@ -111,6 +118,7 @@ export default function Configurator3D() {
   const [variant, setVariant] = useState<'964' | '993'>('964');
   const [bodyColor, setBodyColor] = useState('#b5121b');
   const [wheelColor, setWheelColor] = useState('#d0d0d0');
+  const [wheelDesign, setWheelDesign] = useState<WheelDesign>('fuchs');
   const [interiorColor, setInteriorColor] = useState('#c88a4a');
   const [envPreset, setEnvPreset] = useState<EnvPreset>('studio');
   const [activeTab, setActiveTab] = useState<Tab>('exterior');
@@ -122,6 +130,7 @@ export default function Configurator3D() {
   const selWhl = WHEEL_COLORS.find(c => c.hex === wheelColor);
   const selInt = INTERIOR_COLORS.find(c => c.hex === interiorColor);
   const selEnv = ENVIRONMENTS.find(e => e.preset === envPreset);
+  const selWhlDesign = WHEEL_DESIGNS.find(w => w.id === wheelDesign);
 
   const tabs: { id: Tab; icon: React.ReactNode; label: { en: string; es: string } }[] = [
     { id: 'exterior',     icon: <Palette className="w-4 h-4" />,   label: { en: 'Exterior', es: 'Exterior' } },
@@ -133,19 +142,15 @@ export default function Configurator3D() {
   const resetConfig = () => {
     setBodyColor('#b5121b');
     setWheelColor('#d0d0d0');
+    setWheelDesign('fuchs');
     setInteriorColor('#c88a4a');
     setEnvPreset('studio');
     setAutoRotate(true);
     setShowFloor(true);
   };
 
-  const resetCamera = () => {
-    if (controlsRef.current) {
-      controlsRef.current.reset();
-    }
-  };
+  const resetCamera = () => controlsRef.current?.reset();
 
-  /* ─── color swatch component ─── */
   const ColorSwatch = ({ color, selected, onClick, label }: {
     color: string; selected: boolean; onClick: () => void; label: string;
   }) => (
@@ -153,7 +158,7 @@ export default function Configurator3D() {
       <div
         className={`w-10 h-10 md:w-11 md:h-11 rounded-full border-2 transition-all duration-300 ${
           selected
-            ? 'border-gold scale-110 shadow-[0_0_20px_hsl(38_70%_50%/0.5)]'
+            ? 'border-primary scale-110 shadow-[0_0_20px_hsl(var(--primary)/0.5)]'
             : 'border-border/40 hover:border-muted-foreground hover:scale-105'
         }`}
         style={{ backgroundColor: color }}
@@ -165,9 +170,9 @@ export default function Configurator3D() {
   );
 
   return (
-    <div className="fixed inset-0 bg-[#0a0a0a]">
+    <div className="fixed inset-0 bg-background">
       {/* ─── top bar ─── */}
-      <div className="absolute top-0 left-0 right-0 z-20 flex items-center justify-between px-4 md:px-6 py-3 bg-gradient-to-b from-[#0a0a0a]/95 via-[#0a0a0a]/60 to-transparent">
+      <div className="absolute top-0 left-0 right-0 z-20 flex items-center justify-between px-4 md:px-6 py-3 bg-gradient-to-b from-background/95 via-background/60 to-transparent">
         <div className="flex items-center gap-4">
           <Link
             to="/configurator"
@@ -178,24 +183,24 @@ export default function Configurator3D() {
           </Link>
           <div className="h-5 w-px bg-border/30 hidden sm:block" />
           <h1 className="font-display text-lg md:text-xl tracking-wide">
-            <span className="text-gold">Porsche</span>{' '}
+            <span className="text-primary">Porsche</span>{' '}
             <span className="text-foreground">{variant}</span>{' '}
             <span className="text-muted-foreground text-xs font-body tracking-[0.15em] uppercase ml-2">
-              {lang === 'en' ? 'Photorealistic Studio' : 'Estudio Fotorrealista'}
+              {lang === 'en' ? '3D Configurator' : 'Configurador 3D'}
             </span>
           </h1>
         </div>
         <div className="flex items-center gap-1">
           <button
             onClick={() => setAutoRotate(!autoRotate)}
-            className={`p-2 rounded-md transition-all ${autoRotate ? 'text-gold bg-gold/10' : 'text-muted-foreground hover:text-foreground'}`}
+            className={`p-2 rounded-md transition-all ${autoRotate ? 'text-primary bg-primary/10' : 'text-muted-foreground hover:text-foreground'}`}
             title={autoRotate ? 'Stop rotation' : 'Auto rotate'}
           >
             <RotateCw className="w-4 h-4" />
           </button>
           <button
             onClick={() => setShowFloor(!showFloor)}
-            className={`p-2 rounded-md transition-all ${showFloor ? 'text-gold bg-gold/10' : 'text-muted-foreground hover:text-foreground'}`}
+            className={`p-2 rounded-md transition-all ${showFloor ? 'text-primary bg-primary/10' : 'text-muted-foreground hover:text-foreground'}`}
             title="Toggle reflective floor"
           >
             <Eye className="w-4 h-4" />
@@ -210,14 +215,14 @@ export default function Configurator3D() {
       </div>
 
       {/* ─── model selector ─── */}
-      <div className="absolute top-14 left-1/2 -translate-x-1/2 z-20 flex gap-1 p-1 bg-[#111]/80 backdrop-blur-xl border border-border/20 rounded-xl">
+      <div className="absolute top-14 left-1/2 -translate-x-1/2 z-20 flex gap-1 p-1 bg-card/80 backdrop-blur-xl border border-border/20 rounded-xl">
         {(['964', '993'] as const).map((v) => (
           <button
             key={v}
             onClick={() => setVariant(v)}
             className={`px-6 py-2 text-xs tracking-[0.15em] uppercase font-body rounded-lg transition-all duration-300 ${
               variant === v
-                ? 'bg-gold/15 text-gold border border-gold/20 shadow-[0_0_15px_hsl(38_70%_50%/0.15)]'
+                ? 'bg-primary/15 text-primary border border-primary/20 shadow-[0_0_15px_hsl(var(--primary)/0.15)]'
                 : 'text-muted-foreground hover:text-foreground'
             }`}
           >
@@ -233,46 +238,30 @@ export default function Configurator3D() {
         camera={{ position: [4.5, 2, 6], fov: 35 }}
         gl={{
           antialias: true,
-          toneMapping: 3, // ACESFilmic
+          toneMapping: 3,
           toneMappingExposure: 1.2,
         }}
         className="cursor-grab active:cursor-grabbing"
       >
         <Suspense fallback={<Loader />}>
-          {/* Lighting */}
           <ambientLight intensity={0.15} />
-          <directionalLight
-            position={[8, 12, 6]}
-            intensity={1.5}
-            castShadow
-            shadow-mapSize={[2048, 2048]}
-            shadow-bias={-0.0001}
-          />
+          <directionalLight position={[8, 12, 6]} intensity={1.5} castShadow shadow-mapSize={[2048, 2048]} shadow-bias={-0.0001} />
           <directionalLight position={[-6, 8, -4]} intensity={0.4} color="#b0c4de" />
-          <spotLight
-            position={[0, 15, 0]}
-            intensity={0.6}
-            angle={0.4}
-            penumbra={1}
-            castShadow
-          />
-          {/* Rim light for edge highlights */}
+          <spotLight position={[0, 15, 0]} intensity={0.6} angle={0.4} penumbra={1} castShadow />
           <pointLight position={[-8, 3, -6]} intensity={0.3} color="#ffd700" />
           <pointLight position={[8, 3, 6]} intensity={0.2} color="#87ceeb" />
 
-          {/* Car model */}
           <PorscheCar
             bodyColor={bodyColor}
             wheelColor={wheelColor}
             interiorColor={interiorColor}
             autoRotate={autoRotate}
             variant={variant}
+            wheelDesign={wheelDesign}
           />
 
-          {/* Reflective floor */}
           {showFloor && <ReflectiveFloor />}
 
-          {/* Contact shadows as backup */}
           <ContactShadows
             position={[0, -0.41, 0]}
             opacity={showFloor ? 0 : 0.6}
@@ -281,20 +270,12 @@ export default function Configurator3D() {
             far={4}
           />
 
-          {/* HDRI environment */}
           <Environment preset={envPreset} background={envPreset !== 'studio'} />
 
-          {/* Post-processing */}
           <EffectComposer>
-            <Bloom
-              luminanceThreshold={0.8}
-              luminanceSmoothing={0.9}
-              intensity={0.4}
-              mipmapBlur
-            />
+            <Bloom luminanceThreshold={0.8} luminanceSmoothing={0.9} intensity={0.4} mipmapBlur />
           </EffectComposer>
 
-          {/* Orbit controls */}
           <OrbitControls
             ref={controlsRef}
             enablePan={false}
@@ -310,16 +291,15 @@ export default function Configurator3D() {
 
       {/* ─── bottom panel ─── */}
       <div className={`absolute bottom-0 left-0 right-0 z-20 transition-transform duration-500 ease-out ${panelOpen ? 'translate-y-0' : 'translate-y-[calc(100%-2.75rem)]'}`}>
-        {/* Toggle */}
         <button
           onClick={() => setPanelOpen(!panelOpen)}
-          className="mx-auto flex items-center gap-2 px-8 py-2 bg-[#111]/80 backdrop-blur-xl border border-border/20 border-b-0 rounded-t-xl text-xs text-muted-foreground hover:text-foreground transition-colors"
+          className="mx-auto flex items-center gap-2 px-8 py-2 bg-card/80 backdrop-blur-xl border border-border/20 border-b-0 rounded-t-xl text-xs text-muted-foreground hover:text-foreground transition-colors"
         >
           <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-300 ${panelOpen ? 'rotate-0' : 'rotate-180'}`} />
           {lang === 'en' ? 'Customize' : 'Personalizar'}
         </button>
 
-        <div className="bg-[#0d0d0d]/90 backdrop-blur-2xl border-t border-border/15">
+        <div className="bg-card/90 backdrop-blur-2xl border-t border-border/15">
           {/* Tabs */}
           <div className="flex border-b border-border/10">
             {tabs.map((tab) => (
@@ -328,7 +308,7 @@ export default function Configurator3D() {
                 onClick={() => setActiveTab(tab.id)}
                 className={`flex-1 flex items-center justify-center gap-2 py-3 text-xs tracking-[0.1em] uppercase transition-all duration-300 border-b-2 ${
                   activeTab === tab.id
-                    ? 'text-gold border-gold bg-gold/5'
+                    ? 'text-primary border-primary bg-primary/5'
                     : 'text-muted-foreground border-transparent hover:text-foreground'
                 }`}
               >
@@ -339,7 +319,7 @@ export default function Configurator3D() {
           </div>
 
           {/* Content */}
-          <div className="p-4 md:p-6 max-h-[260px] overflow-y-auto">
+          <div className="p-4 md:p-6 max-h-[280px] overflow-y-auto">
             <AnimatePresence mode="wait">
               {activeTab === 'exterior' && (
                 <motion.div key="ext" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.15 }}>
@@ -356,8 +336,29 @@ export default function Configurator3D() {
 
               {activeTab === 'wheels' && (
                 <motion.div key="whl" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.15 }}>
-                  <p className="text-[10px] text-muted-foreground mb-3 tracking-wider uppercase">
-                    {selWhl?.name[lang] ?? (lang === 'en' ? 'Wheel Color' : 'Color de Rines')}
+                  {/* Wheel Design */}
+                  <p className="text-[10px] text-muted-foreground mb-2 tracking-wider uppercase">
+                    {lang === 'en' ? 'Wheel Design' : 'Diseño de Rin'}: {selWhlDesign?.name[lang]}
+                  </p>
+                  <div className="flex flex-wrap gap-2 mb-4">
+                    {WHEEL_DESIGNS.map(w => (
+                      <button
+                        key={w.id}
+                        onClick={() => setWheelDesign(w.id)}
+                        className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-xs tracking-[0.1em] uppercase border transition-all duration-300 ${
+                          wheelDesign === w.id
+                            ? 'border-primary bg-primary/10 text-primary shadow-[0_0_10px_hsl(var(--primary)/0.15)]'
+                            : 'border-border/30 text-muted-foreground hover:border-muted-foreground hover:text-foreground'
+                        }`}
+                      >
+                        <Disc className="w-3.5 h-3.5" />
+                        {w.name[lang]}
+                      </button>
+                    ))}
+                  </div>
+                  {/* Wheel Color */}
+                  <p className="text-[10px] text-muted-foreground mb-2 tracking-wider uppercase">
+                    {lang === 'en' ? 'Wheel Color' : 'Color de Rin'}: {selWhl?.name[lang]}
                   </p>
                   <div className="flex flex-wrap gap-3">
                     {WHEEL_COLORS.map(c => (
@@ -392,7 +393,7 @@ export default function Configurator3D() {
                         onClick={() => setEnvPreset(env.preset)}
                         className={`px-5 py-2.5 rounded-lg text-xs tracking-[0.1em] uppercase border transition-all duration-300 ${
                           envPreset === env.preset
-                            ? 'border-gold bg-gold/10 text-gold shadow-[0_0_10px_hsl(38_70%_50%/0.15)]'
+                            ? 'border-primary bg-primary/10 text-primary shadow-[0_0_10px_hsl(var(--primary)/0.15)]'
                             : 'border-border/30 text-muted-foreground hover:border-muted-foreground hover:text-foreground'
                         }`}
                       >
@@ -406,7 +407,7 @@ export default function Configurator3D() {
           </div>
 
           {/* Config summary bar */}
-          <div className="px-4 md:px-6 pb-3 flex items-center gap-4 text-[10px] text-muted-foreground/70 tracking-wider uppercase">
+          <div className="px-4 md:px-6 pb-3 flex items-center gap-4 text-[10px] text-muted-foreground/70 tracking-wider uppercase flex-wrap">
             <span className="flex items-center gap-1.5">
               <div className="w-3 h-3 rounded-full border border-border/30" style={{ backgroundColor: bodyColor }} />
               {selExt?.name[lang]}
@@ -414,7 +415,7 @@ export default function Configurator3D() {
             <span className="text-border/20">|</span>
             <span className="flex items-center gap-1.5">
               <div className="w-3 h-3 rounded-full border border-border/30" style={{ backgroundColor: wheelColor }} />
-              {selWhl?.name[lang]}
+              {selWhl?.name[lang]} · {selWhlDesign?.name[lang]}
             </span>
             <span className="text-border/20">|</span>
             <span className="flex items-center gap-1.5">

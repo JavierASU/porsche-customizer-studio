@@ -87,26 +87,36 @@ const Configurator = () => {
       <div className="flex-1 pt-20">
         {/* Step indicator */}
         <div className="border-b border-border">
-          <div className="max-w-7xl mx-auto px-6 py-4 flex items-center gap-2 overflow-x-auto">
-            {steps.map((step, i) => (
-              <button
-                key={step.id}
-                onClick={() => {
-                  if (step.id === 'model' || selectedModel) setCurrentStep(step.id);
-                }}
-                className={`flex items-center gap-2 text-xs tracking-[0.15em] uppercase font-body whitespace-nowrap transition-colors ${
-                  currentStep === step.id ? 'text-gold' : i <= stepIndex ? 'text-foreground' : 'text-muted-foreground'
-                }`}
+          <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+            <div className="flex items-center gap-2 overflow-x-auto">
+              {steps.map((step, i) => (
+                <button
+                  key={step.id}
+                  onClick={() => {
+                    if (step.id === 'model' || selectedModel) setCurrentStep(step.id);
+                  }}
+                  className={`flex items-center gap-2 text-xs tracking-[0.15em] uppercase font-body whitespace-nowrap transition-colors ${
+                    currentStep === step.id ? 'text-gold' : i <= stepIndex ? 'text-foreground' : 'text-muted-foreground'
+                  }`}
+                >
+                  <span className={`w-6 h-6 flex items-center justify-center rounded-full text-[10px] border transition-colors ${
+                    currentStep === step.id ? 'border-gold text-gold' : i < stepIndex ? 'border-foreground text-foreground' : 'border-border text-muted-foreground'
+                  }`}>
+                    {i + 1}
+                  </span>
+                  <span className="hidden sm:inline">{step[lang]}</span>
+                  {i < steps.length - 1 && <span className="text-border mx-1">—</span>}
+                </button>
+              ))}
+            </div>
+            {(selectedModel === '964' || selectedModel === '993') && (
+              <Link
+                to={`/configurator-3d`}
+                className="btn-luxury text-[10px] tracking-[0.15em] uppercase px-4 py-2 flex items-center gap-2"
               >
-                <span className={`w-6 h-6 flex items-center justify-center rounded-full text-[10px] border transition-colors ${
-                  currentStep === step.id ? 'border-gold text-gold' : i < stepIndex ? 'border-foreground text-foreground' : 'border-border text-muted-foreground'
-                }`}>
-                  {i + 1}
-                </span>
-                <span className="hidden sm:inline">{step[lang]}</span>
-                {i < steps.length - 1 && <span className="text-border mx-1">—</span>}
-              </button>
-            ))}
+                <span>🎮</span> {lang === 'en' ? '3D View' : 'Vista 3D'}
+              </Link>
+            )}
           </div>
         </div>
 

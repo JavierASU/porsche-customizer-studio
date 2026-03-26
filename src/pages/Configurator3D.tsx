@@ -4,80 +4,46 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   ArrowLeft, RotateCcw, ChevronDown,
   Palette, CircleDot, Armchair,
-  ChevronLeft, ChevronRight, Eye,
+  ChevronLeft, ChevronRight,
 } from 'lucide-react';
 import { useLang } from '@/lib/i18n';
-
-const imagePath = (model: '964' | '993', color: string) =>
-  new URL(`../assets/${model}/${color}.png`, import.meta.url).href;
-
-const EXTERIOR_COLORS = [
-  { id: 'guards-red', name: { en: 'Guards Red', es: 'Rojo Guardia' } },
-  { id: 'midnight-blue', name: { en: 'Midnight Blue', es: 'Azul Medianoche' } },
-  { id: 'silver', name: { en: 'Silver Metallic', es: 'Plata Metálico' } },
-  { id: 'irish-green', name: { en: 'Irish Green', es: 'Verde Irlandés' } },
-  { id: 'signal-yellow', name: { en: 'Signal Yellow', es: 'Amarillo Señal' } },
-  { id: 'black', name: { en: 'Black', es: 'Negro' } },
-  { id: 'gulf-orange', name: { en: 'Gulf Orange', es: 'Naranja Gulf' } },
-  { id: 'chalk', name: { en: 'Chalk', es: 'Tiza' } },
-  { id: 'miami-blue', name: { en: 'Miami Blue', es: 'Azul Miami' } },
-  { id: 'white', name: { en: 'Grand Prix White', es: 'Blanco Grand Prix' } },
-] as const;
-
-const WHEEL_STYLES = [
-  { id: 'fuchs', name: { en: 'Fuchs Classic', es: 'Fuchs Clásico' } },
-  { id: 'cup', name: { en: 'Cup Design', es: 'Diseño Cup' } },
-  { id: 'turbo-twist', name: { en: 'Turbo Twist', es: 'Turbo Twist' } },
-];
-
-const INTERIOR_COLORS = [
-  { id: 'tan', hex: '#c88a4a', name: { en: 'Tan Leather', es: 'Cuero Habano' } },
-  { id: 'black', hex: '#111111', name: { en: 'Black Leather', es: 'Cuero Negro' } },
-  { id: 'burgundy', hex: '#6b2737', name: { en: 'Burgundy', es: 'Borgoña' } },
-  { id: 'cognac', hex: '#9a5b2f', name: { en: 'Cognac', es: 'Cognac' } },
-  { id: 'cream', hex: '#f5e6c8', name: { en: 'Cream', es: 'Crema' } },
-];
-
-type Tab = 'exterior' | 'wheels' | 'interior';
+import {
+  EXTERIOR_COLORS, WHEEL_STYLES, INTERIOR_COLORS,
+  bodyImagePath, wheelImagePath, interiorImagePath,
+  type ExteriorColor, type WheelStyle, type InteriorColor, type Tab,
+} from '@/components/configurator/ConfiguratorData';
+import DetailPreview from '@/components/configurator/DetailPreview';
 
 export default function Configurator3D() {
   const { lang } = useLang();
 
   const [variant, setVariant] = useState<'964' | '993'>('964');
-  const [bodyColor, setBodyColor] = useState<(typeof EXTERIOR_COLORS)[number]>(EXTERIOR_COLORS[0]);
-  const [wheelStyle, setWheelStyle] = useState<(typeof WHEEL_STYLES)[number]>(WHEEL_STYLES[0]);
-  const [interiorColor, setInteriorColor] = useState<(typeof INTERIOR_COLORS)[number]>(INTERIOR_COLORS[0]);
+  const [bodyColor, setBodyColor] = useState<ExteriorColor>(EXTERIOR_COLORS[0]);
+  const [wheelStyle, setWheelStyle] = useState<WheelStyle>(WHEEL_STYLES[0]);
+  const [interiorColor, setInteriorColor] = useState<InteriorColor>(INTERIOR_COLORS[0]);
   const [activeTab, setActiveTab] = useState<Tab>('exterior');
   const [panelOpen, setPanelOpen] = useState(true);
   const [isTransitioning, setIsTransitioning] = useState(false);
 
-  const [viewIdx, setViewIdx] = useState(0);
-  const currentImage = imagePath(variant, bodyColor.id);
+  // View mode: 'body' shows the car, 'wheel' shows wheel close-up, 'interior' shows interior
+  const [viewMode, setViewMode] = useState<'body' | 'wheel' | 'interior'>('body');
 
-  const nextView = useCallback(() => {
-    setIsTransitioning(true);
-    setTimeout(() => {
-      setViewIdx((i) => (i + 1) % 3);
-      setIsTransitioning(false);
-    }, 180);
-  }, []);
-
-  const prevView = useCallback(() => {
-    setIsTransitioning(true);
-    setTimeout(() => {
-      setViewIdx((i) => (i + 2) % 3);
-      setIsTransitioning(false);
-    }, 180);
-  }, []);
-
+  // Sync view mode with active tab
   useEffect(() => {
-    const handler = (e: KeyboardEvent) => {
-      if (e.key === 'ArrowRight') nextView();
-      if (e.key === 'ArrowLeft') prevView();
-    };
-    window.addEventListener('keydown', handler);
-    return () => window.removeEventListener('keydown', handler);
-  }, [nextView, prevView]);
+    setViewMode(activeTab === 'wheels' ? 'wheel' : activeTab === 'interior' ? 'interior' : 'body');
+  }, [activeTab]);
+
+  const currentImage = viewMode === 'body'
+    ? bodyImagePath(variant, bodyColor.id)
+    : viewMode === 'wheel'
+      ? wheelImagePath(variant, wheelStyle.id)
+      : interiorImagePath(interiorColor.id);
+
+  const imageKey = viewMode === 'body'
+    ? `${variant}-${bodyColor.id}`
+    : viewMode === 'wheel'
+      ? `wheel-${variant}-${wheelStyle.id}`
+      : `interior-${interiorColor.id}`;
 
   const resetConfig = () => {
     setBodyColor(EXTERIOR_COLORS[0]);
@@ -93,6 +59,7 @@ export default function Configurator3D() {
 
   return (
     <div className="fixed inset-0 bg-background overflow-hidden">
+      {/* Top bar */}
       <div className="absolute top-0 left-0 right-0 z-20 flex items-center justify-between px-4 md:px-6 py-3 bg-gradient-to-b from-background/95 via-background/60 to-transparent">
         <div className="flex items-center gap-4">
           <Link to="/configurator" className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors text-sm">
@@ -109,6 +76,7 @@ export default function Configurator3D() {
         </button>
       </div>
 
+      {/* Variant selector */}
       <div className="absolute top-14 left-1/2 -translate-x-1/2 z-20 flex gap-1 p-1 bg-card/80 backdrop-blur-xl border border-border/20 rounded-xl">
         {(['964', '993'] as const).map((v) => (
           <button
@@ -123,32 +91,57 @@ export default function Configurator3D() {
         ))}
       </div>
 
+      {/* Main image area */}
       <div className="absolute inset-0 flex items-center justify-center pt-20 pb-60 md:pb-48">
-        <button onClick={prevView} className="absolute left-4 md:left-8 z-10 p-3 rounded-full bg-card/60 backdrop-blur-lg border border-border/20 text-muted-foreground hover:text-foreground">
-          <ChevronLeft className="w-5 h-5" />
-        </button>
-        <button onClick={nextView} className="absolute right-4 md:right-8 z-10 p-3 rounded-full bg-card/60 backdrop-blur-lg border border-border/20 text-muted-foreground hover:text-foreground">
-          <ChevronRight className="w-5 h-5" />
-        </button>
-
         <motion.img
-          key={`${variant}-${bodyColor.id}`}
+          key={imageKey}
           src={currentImage}
-          alt={`Porsche 911 ${variant} ${bodyColor.name[lang]}`}
+          alt={`Porsche 911 ${variant}`}
           width={1920}
           height={1080}
-          className="max-w-full max-h-full object-contain drop-shadow-2xl select-none"
-          initial={{ opacity: 0, scale: 0.98 }}
-          animate={{ opacity: isTransitioning ? 0 : 1, scale: isTransitioning ? 0.98 : 1 }}
-          transition={{ duration: 0.3, ease: 'easeOut' }}
+          className={`max-w-full max-h-full object-contain drop-shadow-2xl select-none ${
+            viewMode !== 'body' ? 'rounded-2xl max-w-[80%] md:max-w-[60%]' : ''
+          }`}
+          initial={{ opacity: 0, scale: 0.96 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.35, ease: 'easeOut' }}
           draggable={false}
         />
 
+        {/* View mode label */}
         <div className="absolute top-28 left-1/2 -translate-x-1/2 text-[10px] tracking-[0.2em] uppercase text-muted-foreground/70">
-          {lang === 'en' ? 'Photoreal color reference' : 'Referencia de color fotorrealista'}
+          {viewMode === 'body' && (lang === 'en' ? 'Exterior view' : 'Vista exterior')}
+          {viewMode === 'wheel' && (lang === 'en' ? 'Wheel detail' : 'Detalle de rines')}
+          {viewMode === 'interior' && (lang === 'en' ? 'Interior view' : 'Vista interior')}
         </div>
+
+        {/* Small thumbnail of the car when viewing wheel/interior */}
+        <AnimatePresence>
+          {viewMode !== 'body' && (
+            <motion.button
+              initial={{ opacity: 0, x: -30 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -30 }}
+              onClick={() => setActiveTab('exterior')}
+              className="absolute bottom-4 left-4 md:left-8 z-10 rounded-xl overflow-hidden border border-border/30 bg-card/60 backdrop-blur-lg shadow-xl hover:border-primary/40 transition-colors"
+            >
+              <img
+                src={bodyImagePath(variant, bodyColor.id)}
+                alt="Car overview"
+                width={160}
+                height={90}
+                loading="lazy"
+                className="w-32 md:w-40 h-auto object-contain"
+              />
+              <div className="px-2 py-1 text-[9px] tracking-wider uppercase text-muted-foreground">
+                {bodyColor.name[lang]}
+              </div>
+            </motion.button>
+          )}
+        </AnimatePresence>
       </div>
 
+      {/* Bottom panel */}
       <div className={`absolute bottom-0 left-0 right-0 z-20 transition-transform duration-500 ${panelOpen ? 'translate-y-0' : 'translate-y-[calc(100%-2.75rem)]'}`}>
         <button
           onClick={() => setPanelOpen(!panelOpen)}
@@ -159,6 +152,7 @@ export default function Configurator3D() {
         </button>
 
         <div className="bg-card/90 backdrop-blur-2xl border-t border-border/15">
+          {/* Tabs */}
           <div className="flex border-b border-border/10">
             {tabs.map((tab) => (
               <button
@@ -174,6 +168,7 @@ export default function Configurator3D() {
             ))}
           </div>
 
+          {/* Tab content */}
           <div className="p-4 md:p-6 max-h-[220px] overflow-y-auto">
             <AnimatePresence mode="wait">
               {activeTab === 'exterior' && (
@@ -198,14 +193,24 @@ export default function Configurator3D() {
               {activeTab === 'wheels' && (
                 <motion.div key="wh" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }}>
                   <p className="text-[10px] text-muted-foreground mb-3 tracking-wider uppercase">{lang === 'en' ? 'Wheel style' : 'Estilo de rin'}</p>
-                  <div className="flex flex-wrap gap-2">
+                  <div className="flex flex-wrap gap-3">
                     {WHEEL_STYLES.map((w) => (
                       <button
                         key={w.id}
                         onClick={() => setWheelStyle(w)}
-                        className={`px-4 py-2 rounded-lg text-xs uppercase border ${wheelStyle.id === w.id ? 'border-primary text-primary bg-primary/10' : 'border-border/40 text-muted-foreground hover:text-foreground'}`}
+                        className={`flex items-center gap-3 px-4 py-3 rounded-xl border transition-all ${
+                          wheelStyle.id === w.id ? 'border-primary text-primary bg-primary/10' : 'border-border/40 text-muted-foreground hover:text-foreground'
+                        }`}
                       >
-                        {w.name[lang]}
+                        <img
+                          src={wheelImagePath(variant, w.id)}
+                          alt={w.name[lang]}
+                          width={48}
+                          height={48}
+                          loading="lazy"
+                          className="w-12 h-12 rounded-lg object-cover"
+                        />
+                        <span className="text-xs uppercase tracking-wider">{w.name[lang]}</span>
                       </button>
                     ))}
                   </div>
@@ -215,14 +220,24 @@ export default function Configurator3D() {
               {activeTab === 'interior' && (
                 <motion.div key="int" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }}>
                   <p className="text-[10px] text-muted-foreground mb-3 tracking-wider uppercase">{lang === 'en' ? 'Interior color' : 'Color interior'}</p>
-                  <div className="flex flex-wrap gap-2">
+                  <div className="flex flex-wrap gap-3">
                     {INTERIOR_COLORS.map((c) => (
                       <button
                         key={c.id}
                         onClick={() => setInteriorColor(c)}
-                        className={`px-4 py-2 rounded-lg text-xs uppercase border ${interiorColor.id === c.id ? 'border-primary text-primary bg-primary/10' : 'border-border/40 text-muted-foreground hover:text-foreground'}`}
+                        className={`flex items-center gap-3 px-4 py-3 rounded-xl border transition-all ${
+                          interiorColor.id === c.id ? 'border-primary text-primary bg-primary/10' : 'border-border/40 text-muted-foreground hover:text-foreground'
+                        }`}
                       >
-                        {c.name[lang]}
+                        <img
+                          src={interiorImagePath(c.id)}
+                          alt={c.name[lang]}
+                          width={48}
+                          height={48}
+                          loading="lazy"
+                          className="w-12 h-12 rounded-lg object-cover"
+                        />
+                        <span className="text-xs uppercase tracking-wider">{c.name[lang]}</span>
                       </button>
                     ))}
                   </div>
@@ -231,6 +246,7 @@ export default function Configurator3D() {
             </AnimatePresence>
           </div>
 
+          {/* Summary bar */}
           <div className="px-4 md:px-6 pb-3 flex items-center gap-3 text-[10px] text-muted-foreground/80 uppercase flex-wrap">
             <span>{bodyColor.name[lang]}</span>
             <span className="text-border/20">|</span>

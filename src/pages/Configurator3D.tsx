@@ -15,7 +15,7 @@ import {
   Palette, CircleDot, Armchair, Sun,
   RotateCw, Camera, Eye,
 } from 'lucide-react';
-import RealisticCar from '@/components/3d/RealisticCar';
+import PorscheCar from '@/components/3d/PorscheCar';
 import { useLang } from '@/lib/i18n';
 
 /* ─── colour / environment palettes ─── */

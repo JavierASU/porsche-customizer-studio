@@ -1,4 +1,4 @@
-import { Suspense, useRef } from 'react';
+import { Suspense } from 'react';
 import { Canvas } from '@react-three/fiber';
 import {
   OrbitControls,
@@ -7,7 +7,7 @@ import {
   Center,
   MeshReflectorMaterial,
 } from '@react-three/drei';
-import { EffectComposer, Bloom } from '@react-three/postprocessing';
+import { EffectComposer, Bloom, DepthOfField } from '@react-three/postprocessing';
 import PorscheCar from '@/components/3d/PorscheCar';
 import type { WheelDesign } from '@/components/3d/PorscheWheels';
 
@@ -43,17 +43,17 @@ function Floor() {
     <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.52, 0]}>
       <planeGeometry args={[50, 50]} />
       <MeshReflectorMaterial
-        blur={[300, 100]}
+        blur={[400, 200]}
         resolution={1024}
         mixBlur={1}
-        mixStrength={40}
-        roughness={1}
+        mixStrength={60}
+        roughness={0.8}
         depthScale={1.2}
         minDepthThreshold={0.4}
         maxDepthThreshold={1.4}
-        color="#050505"
-        metalness={0.5}
-        mirror={0.5}
+        color="#080808"
+        metalness={0.6}
+        mirror={0.6}
       />
     </mesh>
   );
@@ -65,8 +65,7 @@ function SceneContent({
   wheelColor,
   interiorColor,
   wheelDesign,
-  autoRotate,
-}: Omit<Scene3DProps, 'hdri'>) {
+}: Omit<Scene3DProps, 'hdri' | 'autoRotate'>) {
   return (
     <>
       <Center>
@@ -76,15 +75,17 @@ function SceneContent({
           wheelColor={wheelColor}
           interiorColor={interiorColor}
           wheelDesign={wheelDesign}
-          autoRotate={autoRotate}
+          autoRotate={false}
         />
       </Center>
       <ContactShadows
         position={[0, -0.5, 0]}
-        opacity={0.6}
-        scale={12}
-        blur={2.5}
-        far={4}
+        opacity={0.75}
+        scale={14}
+        blur={3}
+        far={5}
+        resolution={512}
+        color="#000000"
       />
       <Floor />
     </>
@@ -103,31 +104,59 @@ export default function Scene3D({
   return (
     <Canvas
       shadows
-      camera={{ position: [5, 2.5, 5], fov: 40 }}
-      gl={{ antialias: true, toneMappingExposure: 1.2 }}
+      camera={{ position: [4, 2, 4], fov: 45 }}
+      gl={{ antialias: true, toneMappingExposure: 1.5 }}
       dpr={[1, 2]}
       className="w-full h-full"
     >
-      <color attach="background" args={['#0a0a0a']} />
-      <fog attach="fog" args={['#0a0a0a', 15, 25]} />
+      <color attach="background" args={['#080808']} />
+      <fog attach="fog" args={['#080808', 18, 30]} />
 
-      {/* Lighting */}
-      <ambientLight intensity={0.15} />
-      <spotLight
-        position={[10, 10, 5]}
-        angle={0.15}
-        penumbra={1}
-        intensity={1}
+      {/* Main key light */}
+      <directionalLight
+        position={[8, 10, 5]}
+        intensity={1.8}
         castShadow
         shadow-mapSize={[2048, 2048]}
+        shadow-bias={-0.001}
+        shadow-camera-far={30}
+        shadow-camera-left={-8}
+        shadow-camera-right={8}
+        shadow-camera-top={8}
+        shadow-camera-bottom={-8}
       />
+
+      {/* Fill light */}
+      <directionalLight
+        position={[-6, 6, -4]}
+        intensity={0.6}
+        color="#b0c4de"
+      />
+
+      {/* Rim / accent light */}
       <spotLight
-        position={[-10, 8, -5]}
+        position={[-8, 8, -6]}
         angle={0.2}
         penumbra={1}
-        intensity={0.5}
+        intensity={1.2}
+        color="#ffffff"
       />
-      <pointLight position={[0, 5, 0]} intensity={0.3} />
+
+      {/* Top light for roof highlights */}
+      <spotLight
+        position={[0, 12, 0]}
+        angle={0.4}
+        penumbra={1}
+        intensity={0.8}
+        castShadow
+        shadow-mapSize={[1024, 1024]}
+      />
+
+      {/* Ambient fill */}
+      <ambientLight intensity={0.25} />
+
+      {/* Front accent for headlights area */}
+      <pointLight position={[-4, 2, 0]} intensity={0.4} color="#ffe8d0" distance={10} />
 
       {/* HDRI Environment */}
       <Environment preset={HDRI_MAP[hdri] as any} background={false} />
@@ -139,7 +168,6 @@ export default function Scene3D({
           wheelColor={wheelColor}
           interiorColor={interiorColor}
           wheelDesign={wheelDesign}
-          autoRotate={autoRotate}
         />
       </Suspense>
 
@@ -148,19 +176,25 @@ export default function Scene3D({
         autoRotate={autoRotate}
         autoRotateSpeed={0.6}
         enablePan={false}
+        target={[0, 0.5, 0]}
         minPolarAngle={Math.PI / 6}
         maxPolarAngle={Math.PI / 2.2}
-        minDistance={3.5}
-        maxDistance={12}
+        minDistance={3}
+        maxDistance={14}
         makeDefault
       />
 
       {/* Postprocessing */}
       <EffectComposer>
         <Bloom
-          luminanceThreshold={0.9}
-          luminanceSmoothing={0.4}
-          intensity={0.3}
+          luminanceThreshold={0.8}
+          luminanceSmoothing={0.3}
+          intensity={0.6}
+        />
+        <DepthOfField
+          focusDistance={0.02}
+          focalLength={0.02}
+          bokehScale={2}
         />
       </EffectComposer>
     </Canvas>

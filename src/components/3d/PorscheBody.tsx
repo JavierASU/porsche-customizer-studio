@@ -126,8 +126,8 @@ export default function PorscheBody({ variant, bodyColor }: PorscheBodyProps) {
       <mesh position={[2.25, 0.28, 0]} castShadow>
         <boxGeometry args={[0.15, 0.12, is993 ? 1.5 : 1.35]} />
         <meshPhysicalMaterial
-          color={bodyColor} metalness={0.88} roughness={0.08}
-          clearcoat={1} clearcoatRoughness={0.02} envMapIntensity={2.8}
+          color={bodyColor} metalness={0.92} roughness={0.28}
+          clearcoat={1} clearcoatRoughness={0.03} envMapIntensity={3.5}
         />
       </mesh>
 

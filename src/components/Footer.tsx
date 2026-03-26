@@ -2,7 +2,7 @@ import { useLang } from '@/lib/i18n';
 import { Link } from 'react-router-dom';
 
 const Footer = () => {
-  const { t } = useLang();
+  const { lang, t } = useLang();
 
   return (
     <footer id="contact" className="py-20 bg-background border-t border-border">
@@ -16,7 +16,6 @@ const Footer = () => {
               {t.footer.tagline}
             </p>
           </div>
-
           <div>
             <h4 className="text-xs tracking-[0.2em] uppercase text-gold mb-6">{t.footer.navigation}</h4>
             <ul className="space-y-3">
@@ -25,7 +24,6 @@ const Footer = () => {
               <li><Link to="/configurator" className="text-sm text-muted-foreground hover:text-foreground transition-colors">{t.nav.configurator}</Link></li>
             </ul>
           </div>
-
           <div>
             <h4 className="text-xs tracking-[0.2em] uppercase text-gold mb-6">{t.footer.contact}</h4>
             <ul className="space-y-3 text-sm text-muted-foreground">
@@ -35,16 +33,11 @@ const Footer = () => {
             </ul>
           </div>
         </div>
-
         <div className="border-t border-border pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="text-xs text-muted-foreground">
-            © {new Date().getFullYear()} HAUSWERK. {t.footer.rights}
-          </p>
+          <p className="text-xs text-muted-foreground">© {new Date().getFullYear()} HAUSWERK. {t.footer.rights}</p>
           <div className="flex gap-6">
             {['Instagram', 'YouTube', 'LinkedIn'].map((social) => (
-              <a key={social} href="#" className="text-xs text-muted-foreground hover:text-gold transition-colors tracking-wider uppercase">
-                {social}
-              </a>
+              <a key={social} href="#" className="text-xs text-muted-foreground hover:text-gold transition-colors tracking-wider uppercase">{social}</a>
             ))}
           </div>
         </div>

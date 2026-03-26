@@ -5,6 +5,7 @@ import { Trash2 } from 'lucide-react';
 import { useLang } from '@/lib/i18n';
 import { useAuth } from '@/hooks/useAuth';
 import Navbar from '@/components/Navbar';
+import Footer from '@/components/Footer';
 
 interface SavedBuild {
   id: string;
@@ -26,14 +27,11 @@ const MyBuilds = () => {
   const [builds, setBuilds] = useState<SavedBuild[]>([]);
 
   useEffect(() => {
-    if (!loading && !user) {
-      navigate('/auth');
-    }
+    if (!loading && !user) navigate('/auth');
   }, [user, loading, navigate]);
 
   useEffect(() => {
-    const stored = JSON.parse(localStorage.getItem('hauswerk_builds') || '[]');
-    setBuilds(stored);
+    setBuilds(JSON.parse(localStorage.getItem('hauswerk_builds') || '[]'));
   }, []);
 
   const deleteBuild = (id: string) => {
@@ -45,29 +43,19 @@ const MyBuilds = () => {
   if (loading) return null;
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background flex flex-col">
       <Navbar />
-      <div className="pt-24 pb-20">
+      <div className="flex-1 pt-24 pb-20">
         <div className="max-w-4xl mx-auto px-6">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-center mb-12"
-          >
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-12">
             <p className="section-subheading mb-3">{t.builds.subtitle}</p>
             <h1 className="section-heading text-4xl">{t.builds.title}</h1>
           </motion.div>
 
           {builds.length === 0 ? (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="text-center py-20"
-            >
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center py-20">
               <p className="text-muted-foreground mb-6">{t.builds.empty}</p>
-              <Link to="/configurator" className="btn-luxury">
-                {t.builds.startBuilding}
-              </Link>
+              <Link to="/configurator" className="btn-luxury">{t.builds.startBuilding}</Link>
             </motion.div>
           ) : (
             <div className="space-y-4">
@@ -81,12 +69,8 @@ const MyBuilds = () => {
                 >
                   <div>
                     <h3 className="font-display text-xl mb-1">{build.modelName}</h3>
-                    <p className="text-sm text-muted-foreground">
-                      {build.exteriorName} · {build.interiorName} · {build.wheelsName}
-                    </p>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      {new Date(build.createdAt).toLocaleDateString()}
-                    </p>
+                    <p className="text-sm text-muted-foreground">{build.exteriorName} · {build.interiorName} · {build.wheelsName}</p>
+                    <p className="text-xs text-muted-foreground mt-1">{new Date(build.createdAt).toLocaleDateString()}</p>
                   </div>
                   <div className="flex gap-3">
                     <Link
@@ -95,10 +79,7 @@ const MyBuilds = () => {
                     >
                       {t.builds.load}
                     </Link>
-                    <button
-                      onClick={() => deleteBuild(build.id)}
-                      className="p-2 text-muted-foreground hover:text-destructive transition-colors"
-                    >
+                    <button onClick={() => deleteBuild(build.id)} className="p-2 text-muted-foreground hover:text-destructive transition-colors">
                       <Trash2 className="w-4 h-4" />
                     </button>
                   </div>
@@ -108,6 +89,7 @@ const MyBuilds = () => {
           )}
         </div>
       </div>
+      <Footer />
     </div>
   );
 };

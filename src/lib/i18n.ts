@@ -1,8 +1,8 @@
-import { create } from 'zustand' // we'll use a simpler approach
+import { useState, useCallback, useEffect, createContext, useContext } from 'react';
 
 type Lang = 'en' | 'es';
 
-const translations = {
+const translations: Record<Lang, Record<string, Record<string, string>>> = {
   en: {
     nav: {
       home: 'Home',
@@ -141,32 +141,28 @@ const translations = {
       load: 'Cargar en Configurador',
     },
   },
-} as const;
-
-export type Translations = typeof translations.en;
+};
 
 let currentLang: Lang = 'en';
 const listeners = new Set<() => void>();
-
-export function getLang(): Lang {
-  return currentLang;
-}
 
 export function setLang(lang: Lang) {
   currentLang = lang;
   listeners.forEach((l) => l());
 }
 
-export function t(): Translations {
-  return translations[currentLang];
-}
+export function useLang() {
+  const [, setTick] = useState(0);
 
-export function useLang(): [Lang, Translations] {
-  const [, setTick] = (await import('react')).useState(0);
-  const react = await import('react');
-  // This won't work as async. Let's use a different approach.
-  return [currentLang, translations[currentLang]];
-}
+  useEffect(() => {
+    const listener = () => setTick((t) => t + 1);
+    listeners.add(listener);
+    return () => { listeners.delete(listener); };
+  }, []);
 
-// Simple hook - we'll use React properly
-export { translations };
+  return {
+    lang: currentLang,
+    t: translations[currentLang],
+    setLang,
+  };
+}

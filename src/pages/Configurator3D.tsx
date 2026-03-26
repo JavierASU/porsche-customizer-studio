@@ -261,7 +261,7 @@ export default function Configurator3D() {
           <pointLight position={[8, 3, 6]} intensity={0.2} color="#87ceeb" />
 
           {/* Car model */}
-          <RealisticCar
+          <PorscheCar
             bodyColor={bodyColor}
             wheelColor={wheelColor}
             interiorColor={interiorColor}

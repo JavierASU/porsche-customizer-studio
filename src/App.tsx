@@ -5,6 +5,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Configurator from "./pages/Configurator";
+import Configurator3D from "./pages/Configurator3D";
 import MyBuilds from "./pages/MyBuilds";
 import NotFound from "./pages/NotFound";
 

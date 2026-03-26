@@ -20,6 +20,7 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/configurator" element={<Configurator />} />
+          <Route path="/configurator-3d" element={<Configurator3D />} />
           <Route path="/my-builds" element={<MyBuilds />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
